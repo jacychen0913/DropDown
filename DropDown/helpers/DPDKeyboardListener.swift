@@ -11,17 +11,13 @@
 import UIKit
 
 internal final class KeyboardListener {
-	
 	static let sharedInstance = KeyboardListener()
-	
 	fileprivate(set) var isVisible = false
 	fileprivate(set) var keyboardFrame = CGRect.zero
 	fileprivate var isListening = false
-	
 	deinit {
 		stopListeningToKeyboard()
 	}
-	
 }
 
 //MARK: - Notifications
@@ -32,9 +28,7 @@ extension KeyboardListener {
 		if isListening {
 			return
 		}
-		
 		isListening = true
-		
 		NotificationCenter.default.addObserver(
 			self,
 			selector: #selector(keyboardWillShow(_:)),
@@ -66,7 +60,6 @@ extension KeyboardListener {
 	fileprivate func keyboardFrame(fromNotification notification: Notification) -> CGRect {
 		return ((notification as NSNotification).userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue)?.cgRectValue ?? CGRect.zero
 	}
-	
 }
 
 #endif
