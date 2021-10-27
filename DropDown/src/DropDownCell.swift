@@ -11,8 +11,10 @@
 import UIKit
 
 open class DropDownCell: UITableViewCell {
-    
+  
   //UI
+  @IBOutlet weak var iconTopConstrain: NSLayoutConstraint!
+  @IBOutlet weak var labelTopConstrain: NSLayoutConstraint!
   @IBOutlet weak var optionIcon: UIImageView!
   @IBOutlet var optionLabel: UILabel!
   

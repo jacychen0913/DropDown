@@ -901,9 +901,6 @@ extension DropDown {
     accessibilityViewIsModal = true
     UIAccessibility.post(notification: .screenChanged, argument: self)
 
-    //deselectRows(at: selectedRowIndices)
-//    selectRows(at: selectedRowIndices)
-
     return (layout.canBeDisplayed, layout.offscreenHeight)
   }
 
@@ -1032,7 +1029,8 @@ extension DropDown {
 
   /// Returns the height needed to display all cells.
   fileprivate var tableHeight: CGFloat {
-    return tableView.rowHeight * CGFloat(dataSource.count)
+    // Extra space will be added to first and last cell.
+    return tableView.rowHeight * CGFloat(dataSource.count) + DPDConstant.UI.RowExtraSpace * 2
   }
 
     //MARK: Objective-C methods for converting the Swift type Index
@@ -1074,6 +1072,12 @@ extension DropDown: UITableViewDataSource, UITableViewDelegate {
     return cell
   }
   
+  public func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+    return (indexPath.row == 0 || indexPath.row == dataSource.count - 1 ?
+            DPDConstant.UI.RowHeight + DPDConstant.UI.RowExtraSpace :
+            DPDConstant.UI.RowHeight)
+  }
+  
   fileprivate func configureCell(_ cell: DropDownCell, at index: Int) {
     if index >= 0 && index < localizationKeysDataSource.count {
       cell.accessibilityIdentifier = localizationKeysDataSource[index].text
@@ -1091,6 +1095,11 @@ extension DropDown: UITableViewDataSource, UITableViewDelegate {
     } else {
       cell.optionLabel.text = dataSource[index].text
       cell.optionIcon.image = dataSource[index].icon
+    }
+    
+    if index == 0 {
+      cell.iconTopConstrain.constant = DPDConstant.UI.RowVerticalSpace + DPDConstant.UI.RowExtraSpace
+      cell.labelTopConstrain.constant = DPDConstant.UI.RowVerticalSpace + DPDConstant.UI.RowExtraSpace
     }
     
     customCellConfiguration?(index, dataSource[index], cell)
@@ -1112,8 +1121,7 @@ extension DropDown: UITableViewDataSource, UITableViewDelegate {
         multiSelectionCallback(selectedRowIndicesArray, selectedRows)
         return
       }
-      else {
-        selectedRowIndices.insert(selectedRowIndex)
+      else if selectedRowIndices.insert(selectedRowIndex).inserted {
         let selectedRowIndicesArray = Array(selectedRowIndices)
         let selectedRows = selectedRowIndicesArray.map { dataSource[$0] }
         selectionAction?(selectedRowIndex, dataSource[selectedRowIndex])
@@ -1123,13 +1131,15 @@ extension DropDown: UITableViewDataSource, UITableViewDelegate {
       }
     }
     
+    guard !selectedRowIndices.contains(selectedRowIndex) else {
+      // No-op if the row has been selected.
+      return
+    }
+    
     // Perform single selection logic
     selectedRowIndices.removeAll()
     selectedRowIndices.insert(selectedRowIndex)
     selectionAction?(selectedRowIndex, dataSource[selectedRowIndex])
-    
-    // deselect cell to remove the hight light color
-    deselectRow(at: selectedRowIndex)
     
     if let _ = anchorView as? UIBarButtonItem {
       // DropDown's from UIBarButtonItem are menus so we deselect the selected menu right after selection

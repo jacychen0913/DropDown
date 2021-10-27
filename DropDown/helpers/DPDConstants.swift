@@ -27,13 +27,16 @@ internal struct DPDConstant {
     static let SeparatorColor = UIColor(red: 0.235, green: 0.235, blue: 0.282, alpha: 1)
     static let CornerRadius: CGFloat = 16
     static let RowHeight: CGFloat = 44
+    static let RowVerticalSpace: CGFloat = 6
+    static let RowExtraSpace: CGFloat = 8
     static let HeightPadding: CGFloat = 20
 
     struct Shadow {
+      // No shadow by default
       static let Color = UIColor.darkGray
       static let Offset = CGSize.zero
-      static let Opacity: Float = 0.4
-      static let Radius: CGFloat = 16
+      static let Opacity: Float = 0
+      static let Radius: CGFloat = 0
     }
   }
 
