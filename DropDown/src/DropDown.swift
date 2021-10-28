@@ -445,8 +445,8 @@ public final class DropDown: UIView {
   /// The action to execute when the user cancels/hides the drop down.
   public var cancelAction: Closure?
 
-  /// The dismiss mode of the drop down. Default is `OnTap`.
-  public var dismissMode = DismissMode.onTap {
+  /// The dismiss mode of the drop down. Default is `automatic`.
+  public var dismissMode = DismissMode.automatic {
     willSet {
       if newValue == .onTap {
         let gestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(dismissableViewTapped))
@@ -533,7 +533,7 @@ private extension DropDown {
     setHiddentState()
     isHidden = true
 
-    dismissMode = .onTap
+    dismissMode = .automatic
 
     tableView.delegate = self
     tableView.dataSource = self
