@@ -946,6 +946,7 @@ extension DropDown {
   }
 
   fileprivate func cancel() {
+    // Remove the selection before leave.
     hide()
     cancelAction?()
   }
@@ -1097,10 +1098,12 @@ extension DropDown: UITableViewDataSource, UITableViewDelegate {
       cell.optionIcon.image = dataSource[index].icon
     }
     
-    if index == 0 {
-      cell.iconTopConstrain.constant = DPDConstant.UI.RowVerticalSpace + DPDConstant.UI.RowExtraSpace
-      cell.labelTopConstrain.constant = DPDConstant.UI.RowVerticalSpace + DPDConstant.UI.RowExtraSpace
-    }
+    // Handle the special top gap for the fisrt cell.
+    let topSpace = index == 0 ?
+                   DPDConstant.UI.RowVerticalSpace + DPDConstant.UI.RowExtraSpace :
+                   DPDConstant.UI.RowVerticalSpace
+    cell.iconTopConstrain.constant = topSpace
+    cell.labelTopConstrain.constant = topSpace
     
     customCellConfiguration?(index, dataSource[index], cell)
   }
@@ -1137,14 +1140,9 @@ extension DropDown: UITableViewDataSource, UITableViewDelegate {
     }
     
     // Perform single selection logic
-    selectedRowIndices.removeAll()
     selectedRowIndices.insert(selectedRowIndex)
+    deselectRows(at: selectedRowIndices)
     selectionAction?(selectedRowIndex, dataSource[selectedRowIndex])
-    
-    if let _ = anchorView as? UIBarButtonItem {
-      // DropDown's from UIBarButtonItem are menus so we deselect the selected menu right after selection
-      deselectRow(at: selectedRowIndex)
-    }
     if !dataSource[selectedRowIndex].isSticky {
       hide()
     }

@@ -20,10 +20,10 @@ internal struct DPDConstant {
 
   internal struct UI {
     static let TextColor = UIColor.white
-    static let SelectedTextColor = UIColor.white
+    static let SelectedTextColor =  UIColor(red: 0.596, green: 0.886, blue: 0.973, alpha: 1)
     static let TextFont = UIFont.systemFont(ofSize: 13)
     static let BackgroundColor = UIColor(red: 0.157, green: 0.157, blue: 0.18, alpha: 1)
-    static let SelectionBackgroundColor = UIColor(red: 0.4, green: 0.4, blue: 0.4, alpha: 1)
+    static let SelectionBackgroundColor = UIColor(red: 0.251, green: 0.251, blue: 0.247, alpha: 0.5)
     static let SeparatorColor = UIColor(red: 0.235, green: 0.235, blue: 0.282, alpha: 1)
     static let CornerRadius: CGFloat = 16
     static let RowHeight: CGFloat = 44
