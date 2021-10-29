@@ -385,13 +385,29 @@ public final class DropDown: UIView {
   /**
   The data source for the drop down.
 
-  Changing the data source automatically reloads the drop down.
+  Using the |updateDataSource| methods to update it.
   */
-  public var dataSource = [MenuDataType]() {
-    didSet {
-      deselectRows(at: selectedRowIndices)
-      reloadAllComponents()
-    }
+  var dataSource = [MenuDataType]()
+  
+  /**
+  The method to update all the data source for the drop down.
+  */
+  public func updateDataSource(_ items: [MenuDataType]) {
+    dataSource = items
+    deselectRows(at: selectedRowIndices)
+    reloadAllComponents()
+  }
+  
+  /**
+  The method to update one data source item for the drop down.
+  */
+  public func updateDataSourceItem(_ index:Int, with item:MenuDataType) {
+    deselectRow(at: index)
+    dataSource[index] = item
+    tableView.beginUpdates()
+    tableView.reloadRows(at: [IndexPath(row: index, section: 0)], with: .none)
+    selectRows(at: selectedRowIndices)
+    tableView.endUpdates()
   }
 
   /**
@@ -522,7 +538,8 @@ private extension DropDown {
 
   func setup() {
     tableView.register(cellNib, forCellReuseIdentifier: DPDConstant.ReusableIdentifier.DropDownCell)
-
+    tableView.allowsMultipleSelection = true
+    
     DispatchQueue.main.async {
       //HACK: If not done in dispatch_async on main queue `setupUI` will have no effect
       self.updateConstraintsIfNeeded()
@@ -1139,13 +1156,16 @@ extension DropDown: UITableViewDataSource, UITableViewDelegate {
       return
     }
     
-    // Perform single selection logic
+    // Perform the single selection logic.
     selectedRowIndices.insert(selectedRowIndex)
-    deselectRows(at: selectedRowIndices)
-    selectionAction?(selectedRowIndex, dataSource[selectedRowIndex])
     if !dataSource[selectedRowIndex].isSticky {
+      // If it's the non-sticky item, deselect the menu item since the menu view
+      // would be dismissed. The selected items might be changed when presenting
+      // it next time.
+      deselectRows(at: selectedRowIndices)
       hide()
     }
+    selectionAction?(selectedRowIndex, dataSource[selectedRowIndex])
   }
 }
 
