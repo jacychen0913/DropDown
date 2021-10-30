@@ -406,7 +406,6 @@ public final class DropDown: UIView {
     dataSource[index] = item
     tableView.beginUpdates()
     tableView.reloadRows(at: [IndexPath(row: index, section: 0)], with: .none)
-    selectRows(at: selectedRowIndices)
     tableView.endUpdates()
   }
 
@@ -863,8 +862,23 @@ extension DropDown {
   - returns: Wether it succeed and how much height is needed to display all cells at once.
   */
   @discardableResult
-    public func show(onTopOf window: UIWindow? = nil, beforeTransform transform: CGAffineTransform? = nil, anchorPoint: CGPoint? = nil) -> (canBeDisplayed: Bool, offscreenHeight: CGFloat?) {
-    if self == DropDown.VisibleDropDown && DropDown.VisibleDropDown?.isHidden == false { // added condition - DropDown.VisibleDropDown?.isHidden == false -> to resolve forever hiding dropdown issue when continuous taping on button - Kartik Patel - 2016-12-29
+  public func show(selectedIndeces:Set<Int>?) -> (canBeDisplayed: Bool, offscreenHeight: CGFloat?) {
+    if let indeces = selectedIndeces {
+      deselectRows(at: selectedRowIndices)
+      selectRows(at: indeces)
+    }
+    return show()
+  }
+  
+  /**
+  Shows the drop down if enough height.
+
+  - returns: Wether it succeed and how much height is needed to display all cells at once.
+  */
+  @discardableResult
+  public func show(onTopOf window: UIWindow? = nil, beforeTransform transform: CGAffineTransform? = nil, anchorPoint: CGPoint? = nil) -> (canBeDisplayed: Bool, offscreenHeight: CGFloat?) {
+    if self == DropDown.VisibleDropDown && DropDown.VisibleDropDown?.isHidden == false {
+      // added condition - DropDown.VisibleDropDown?.isHidden == false -> to resolve forever hiding dropdown issue when continuous taping on button - Kartik Patel - 2016-12-29
       return (true, 0)
     }
 
@@ -875,7 +889,7 @@ extension DropDown {
     willShowAction?()
 
     DropDown.VisibleDropDown = self
-
+    
     setNeedsUpdateConstraints()
 
     let visibleWindow = window != nil ? window : anchorView?.plainView.window
@@ -1002,8 +1016,9 @@ extension DropDown {
         at: IndexPath(row: index, section: 0), animated: true, scrollPosition: scrollPosition)
       selectedRowIndices.insert(index)
     } else {
+      // No row set, deselect all the items.
       deselectRows(at: selectedRowIndices)
-            selectedRowIndices.removeAll()
+      selectedRowIndices.removeAll()
     }
   }
     
