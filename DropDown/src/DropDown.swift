@@ -89,7 +89,8 @@ public final class DropDown: UIView {
   fileprivate let tableViewContainer = UIView()
   fileprivate let tableView = UITableView()
   fileprivate var templateCell: DropDownCell!
-    fileprivate lazy var arrowIndication: UIImageView = {
+  fileprivate var isTableViewHighlighted = false
+  fileprivate lazy var arrowIndication: UIImageView = {
         UIGraphicsBeginImageContextWithOptions(CGSize(width: 20, height: 10), false, 0)
         let path = UIBezierPath()
         path.move(to: CGPoint(x: 0, y: 10))
@@ -550,7 +551,6 @@ private extension DropDown {
     isHidden = true
 
     dismissMode = .automatic
-
     tableView.delegate = self
     tableView.dataSource = self
     
@@ -969,15 +969,21 @@ extension DropDown {
       },
       completion: { [weak self] finished in
         guard let `self` = self else { return }
-
+        self.tableView.visibleCells.forEach {
+          $0.setSelected(false, animated: false)
+        }
+        self.deselectRows(at: self.selectedRowIndices)
         self.isHidden = true
         self.removeFromSuperview()
         UIAccessibility.post(notification: .screenChanged, argument: nil)
     })
   }
-
+  
   fileprivate func cancel() {
-    // Remove the selection before leave.
+    // Should not cancel if any cell is under highlighthing mode.
+    guard !isTableViewHighlighted else {
+      return
+    }
     hide()
     cancelAction?()
   }
@@ -1142,6 +1148,14 @@ extension DropDown: UITableViewDataSource, UITableViewDelegate {
 
   public func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
         cell.isSelected = selectedRowIndices.first{ $0 == (indexPath as NSIndexPath).row } != nil
+  }
+  
+  public func tableView(_ tableView: UITableView, didHighlightRowAt indexPath: IndexPath) {
+    isTableViewHighlighted = true
+  }
+  
+  public func tableView(_ tableView: UITableView, didUnhighlightRowAt indexPath: IndexPath) {
+    isTableViewHighlighted = false
   }
 
   public func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
