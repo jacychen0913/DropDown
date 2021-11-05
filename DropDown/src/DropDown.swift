@@ -395,6 +395,7 @@ public final class DropDown: UIView {
   */
   public func updateDataSource(_ items: [MenuDataType]) {
     dataSource = items
+    tableView.separatorStyle = dataSource.count > 1 ? .singleLine : .none
     deselectRows(at: selectedRowIndices)
     reloadAllComponents()
   }
